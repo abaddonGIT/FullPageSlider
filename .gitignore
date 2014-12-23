@@ -1,0 +1,8 @@
+# Created by .gitignore support plugin (hsz.mobi)
+node_modules
+img
+css/slider.less
+.idea
+package.json
+gulpfile.js
+.jshintrc
