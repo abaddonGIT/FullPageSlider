@@ -45,7 +45,7 @@
   animation-fill-mode: forwards;
 }
 .full-slider .item.badie {
-  opacity: 1;
+  opacity: 0;
 }
 @-webkit-keyframes effect1 {
   0% {

@@ -5,14 +5,16 @@
 var FullPageSlider = null;
 (function (w, d, n) {
     "use strict";
-    var config = {}, that = null;
+    var config = {}, that = null, $ = w.jQuery || false;
     FullPageSlider = function (options) {
         config = this.ext({
             sliderSelector: null,
             startSlide: 0,
             next: '.next',
             prev: '.prev',
-            itemClass: '.item'
+            itemClass: '.item',
+            animationDelay: 13000,
+            scaleCof: 13
         }, options);
 
         this.ext(this, {
@@ -20,10 +22,12 @@ var FullPageSlider = null;
             goodSlides: [],
             index: 0,
             handlers: {},
-            active: "active"
+            active: "active",
+            css3: true
         });
         if (/MSIE 9/i.test(n.userAgent)) {
             this.active = "badie";
+            this.css3 = false;
         }
         //Построение слайдера
         this.buildSlider = function () {
@@ -49,7 +53,6 @@ var FullPageSlider = null;
                     this.index = config.startSlide;
                     //Стартуем
                     this.emit("load");
-                    this.addClass(this.goodSlides[this.index], this.active);
                     //Вешаем прослушку на окончание анимации
                     this.addAnimationEndEvent();
                 }.bind(this));
@@ -59,20 +62,52 @@ var FullPageSlider = null;
             }
         };
         this.addAnimationEndEvent = function () {
-            var ln = this.goodSlides.length;
-            while (ln--) {
-                var slide = this.goodSlides[ln];
-                this.prefixedEvent(slide, "AnimationEnd", function () {
-                    var next = this.goodSlides[this.index + 1];
-                    this.removeClass(this.goodSlides[this.index], this.active);
-                    if (!next) {
-                        this.index = 0;
-                    } else {
-                        this.index++;
-                    }
-                    this.addClass(this.goodSlides[this.index], this.active);
-                }.bind(this));
+            if (this.css3) {
+                this.addClass(this.goodSlides[this.index], this.active);
+                var ln = this.goodSlides.length;
+                while (ln--) {
+                    var slide = this.goodSlides[ln];
+                    this.prefixedEvent(slide, "AnimationEnd", function () {
+                        var next = this.goodSlides[this.index + 1];
+                        this.removeClass(this.goodSlides[this.index], this.active);
+                        if (!next) {
+                            this.index = 0;
+                        } else {
+                            this.index++;
+                        }
+                        this.addClass(this.goodSlides[this.index], this.active);
+                        this.emit("tic");
+                    }.bind(this));
+                }
+            } else {
+                if ($) {//Если есть jquery
+                    this.ieAnimation();
+                } else {
+                    this.throwError("warn", "Ваш браузер не поддерживает css3 анимацию и вы забыли подключить jQuery!!!");
+                }
             }
+        };
+        this.ieAnimation = function () {
+            this.addClass(this.goodSlides[this.index], this.active);
+            $(this.goodSlides[this.index]).animate({"opacity": 1}, {
+                step: function (now) {
+                    $(this).css('-ms-transform', 'scale(' + (1 + (now / config.scaleCof) ) + ')');
+                },
+                done: function () {
+                    that.removeClass(that.goodSlides[that.index], that.active);
+                    $(this).animate({"opacity": 0}, config.animationDelay / 2, function () {
+                        var next = that.goodSlides[that.index + 1];
+                        if (!next) {
+                            that.index = 0;
+                        } else {
+                            that.index++;
+                        }
+                        this.emit("tic");
+                        that.ieAnimation();
+                    });
+                },
+                duration: config.animationDelay / 2
+            });
         };
         this.nextSlide = function (e) {
             that.paginationAction("next");
@@ -84,7 +119,8 @@ var FullPageSlider = null;
         };
         this.paginationAction = function (type) {
             that.removeClass(that.goodSlides[that.index], that.active);
-            var phase;
+            var phase, prevPhase = that.index;
+            console.log(that.index);
             switch (type) {
                 case "next":
                     phase = that.goodSlides[that.index + 1];
@@ -95,8 +131,13 @@ var FullPageSlider = null;
                     phase ? that.index-- : that.index = that.goodSlides.length - 1;
                     break;
             }
-            that.emit(type, that.index);
-            that.addClass(that.goodSlides[that.index], that.active);
+            if (that.css3) {
+                that.emit(type, that.index);
+                that.addClass(that.goodSlides[that.index], that.active);
+            } else {
+                prevPhase ? $(that.goodSlides[prevPhase]).stop(true, false) : "";
+                that.ieAnimation();
+            }
         };
         //строим слайдер
         this.buildSlider();
