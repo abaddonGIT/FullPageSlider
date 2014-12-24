@@ -13,6 +13,7 @@ var FullPageSlider = null;
             next: '.next',
             prev: '.prev',
             itemClass: '.item',
+            effectName: "one",
             animationDelay: 13000,
             scaleCof: 13
         }, options);
@@ -67,16 +68,18 @@ var FullPageSlider = null;
                 var ln = this.goodSlides.length;
                 while (ln--) {
                     var slide = this.goodSlides[ln];
-                    this.prefixedEvent(slide, "AnimationEnd", function () {
-                        var next = this.goodSlides[this.index + 1];
-                        this.removeClass(this.goodSlides[this.index], this.active);
-                        if (!next) {
-                            this.index = 0;
-                        } else {
-                            this.index++;
+                    this.prefixedEvent(slide, "AnimationEnd", function (e) {
+                        if (e.animationName === config.effectName) {
+                            var next = this.goodSlides[this.index + 1];
+                            this.removeClass(this.goodSlides[this.index], this.active);
+                            if (!next) {
+                                this.index = 0;
+                            } else {
+                                this.index++;
+                            }
+                            this.addClass(this.goodSlides[this.index], this.active);
+                            this.emit("tic");
                         }
-                        this.addClass(this.goodSlides[this.index], this.active);
-                        this.emit("tic");
                     }.bind(this));
                 }
             } else {

@@ -31,13 +31,13 @@
   background-position: 50% 50%;
 }
 .full-slider .item.active {
-  -webkit-animation-name: effect1;
+  -webkit-animation-name: two;
   -webkit-animation-duration: 13s;
   -webkit-animation-timing-function: linear;
   -webkit-animation-delay: 0;
   -webkit-animation-iteration-count: 1;
   -webkit-animation-fill-mode: forwards;
-  animation-name: effect1;
+  animation-name: two;
   animation-duration: 13s;
   animation-timing-function: linear;
   animation-delay: 0;
@@ -47,7 +47,7 @@
 .full-slider .item.badie {
   opacity: 0;
 }
-@-webkit-keyframes effect1 {
+@-webkit-keyframes one {
   0% {
     opacity: 0;
     -webkit-animation-timing-function: ease-in;
@@ -70,7 +70,7 @@
     -webkit-transform: scale(1.1) rotate(3deg);
   }
 }
-@keyframes effect1 {
+@keyframes one {
   0% {
     opacity: 0;
     animation-timing-function: ease-in;
@@ -91,5 +91,51 @@
   100% {
     opacity: 0;
     transform: scale(1.1) rotate(3deg);
+  }
+}
+@-webkit-keyframes two {
+  0% {
+    opacity: 0;
+    -webkit-animation-timing-function: ease-in;
+  }
+  27% {
+    opacity: 1;
+    transform: scale(1.05);
+    -webkit-animation-timing-function: ease-out;
+  }
+  57% {
+    opacity: 1;
+    -webkit-transform: scale(1.1);
+  }
+  80% {
+    opacity: 1;
+    -webkit-transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: scale(1.1);
+  }
+}
+@keyframes two {
+  0% {
+    opacity: 0;
+    animation-timing-function: ease-in;
+  }
+  27% {
+    opacity: 1;
+    transform: scale(1.05);
+    animation-timing-function: ease-out;
+  }
+  57% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1);
   }
 }
