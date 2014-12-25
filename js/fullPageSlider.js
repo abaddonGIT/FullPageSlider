@@ -105,7 +105,7 @@ var FullPageSlider = null;
                         } else {
                             that.index++;
                         }
-                        this.emit("tic");
+                        that.emit("tic");
                         that.ieAnimation();
                     });
                 },
