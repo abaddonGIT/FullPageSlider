@@ -9,5 +9,9 @@
         });
 
         slider.run();
+
+        slider.on("load", function () {
+            console.log("i am loaded!!!");
+        });
     }
 }(window, document, FullPageSlider));
