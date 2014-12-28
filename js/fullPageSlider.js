@@ -1,9 +1,9 @@
 /**
  * Created by abaddon on 21.12.2014.
  */
-/*global window, document, console*/
+/*global window, document, console, setTimeout, navigator*/
 var FullPageSlider = null;
-(function (w, d, n) {
+(function (w, d, n, timeout) {
     "use strict";
     var config = {}, that = null, $ = w.jQuery || false;
     FullPageSlider = function (options) {
@@ -30,19 +30,31 @@ var FullPageSlider = null;
             this.active = "badie";
             this.css3 = false;
         }
+        this.run = function () {
+            //строим слайдер
+            return this.buildSlider();
+        };
         //Построение слайдера
         this.buildSlider = function () {
             this.slider = d.querySelector(config.sliderSelector);
             if (this.slider) {
                 this.addClass(this.slider, "full-slider");
-                //Вперед
-                d.querySelector(this.config.next).addEventListener("click", this.nextSlide, false);
-                //Назад
-                d.querySelector(this.config.prev).addEventListener("click", this.prevSlide, false);
+                this.navigateButtons();
                 this.getAllSlides();
             } else {
                 this.throwError("error", "Указан неправильный селектор контенера!!!");
-                return;
+                return false;
+            }
+        };
+        this.navigateButtons = function () {
+            var next = d.querySelector(this.config.next),
+                prev = d.querySelector(this.config.prev);
+
+            if (next) {
+                d.querySelector(this.config.next).addEventListener("click", this.nextSlide, false);
+            }
+            if (prev) {
+                d.querySelector(this.config.prev).addEventListener("click", this.prevSlide, false);
             }
         };
         //Находим все слайды
@@ -66,6 +78,7 @@ var FullPageSlider = null;
             if (this.css3) {
                 this.addClass(this.goodSlides[this.index], this.active);
                 var ln = this.goodSlides.length;
+
                 while (ln--) {
                     var slide = this.goodSlides[ln];
                     this.prefixedEvent(slide, "AnimationEnd", function (e) {
@@ -77,8 +90,10 @@ var FullPageSlider = null;
                             } else {
                                 this.index++;
                             }
-                            this.addClass(this.goodSlides[this.index], this.active);
-                            this.emit("tic");
+                            timeout(function () {
+                                that.addClass(that.goodSlides[that.index], that.active);
+                                that.emit("tic");
+                            }, 0);
                         }
                     }.bind(this));
                 }
@@ -134,16 +149,16 @@ var FullPageSlider = null;
                     phase ? that.index-- : that.index = that.goodSlides.length - 1;
                     break;
             }
-            if (that.css3) {
-                that.emit(type, that.index);
-                that.addClass(that.goodSlides[that.index], that.active);
-            } else {
-                prevPhase ? $(that.goodSlides[prevPhase]).stop(true, false) : "";
-                that.ieAnimation();
-            }
+            timeout(function () {
+                if (that.css3) {
+                    that.emit(type, that.index);
+                    that.addClass(that.goodSlides[that.index], that.active);
+                } else {
+                    prevPhase ? $(that.goodSlides[prevPhase]).stop(true, false) : "";
+                    that.ieAnimation();
+                }
+            }, 0);
         };
-        //строим слайдер
-        this.buildSlider();
         that = this;
     };
 
@@ -228,4 +243,4 @@ var FullPageSlider = null;
             }
         }
     };
-}(window, document, navigator));
+}(window, document, navigator, setTimeout));

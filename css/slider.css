@@ -31,13 +31,13 @@
   background-position: 50% 50%;
 }
 .full-slider .item.active {
-  -webkit-animation-name: two;
+  -webkit-animation-name: one;
   -webkit-animation-duration: 13s;
   -webkit-animation-timing-function: linear;
   -webkit-animation-delay: 0;
   -webkit-animation-iteration-count: 1;
   -webkit-animation-fill-mode: forwards;
-  animation-name: two;
+  animation-name: one;
   animation-duration: 13s;
   animation-timing-function: linear;
   animation-delay: 0;

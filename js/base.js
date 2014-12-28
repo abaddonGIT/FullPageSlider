@@ -7,5 +7,7 @@
         var slider = new Slider({
             sliderSelector: "#slider"
         });
+
+        slider.run();
     }
 }(window, document, FullPageSlider));
