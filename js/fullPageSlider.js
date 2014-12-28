@@ -139,7 +139,6 @@ var FullPageSlider = null;
         this.paginationAction = function (type) {
             that.removeClass(that.goodSlides[that.index], that.active);
             var phase, prevPhase = that.index;
-            console.log(that.index);
             switch (type) {
                 case "next":
                     phase = that.goodSlides[that.index + 1];
