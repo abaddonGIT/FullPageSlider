@@ -47,14 +47,14 @@ var FullPageSlider = null;
             }
         };
         this.navigateButtons = function () {
-            var next = d.querySelector(this.config.next),
-                prev = d.querySelector(this.config.prev);
+            this.next = d.querySelector(this.config.next);
+            this.prev = d.querySelector(this.config.prev);
 
-            if (next) {
-                d.querySelector(this.config.next).addEventListener("click", this.nextSlide, false);
+            if (this.next) {
+                this.next.addEventListener("click", this.nextSlide, false);
             }
-            if (prev) {
-                d.querySelector(this.config.prev).addEventListener("click", this.prevSlide, false);
+            if (this.prev) {
+                this.prev.addEventListener("click", this.prevSlide, false);
             }
         };
         //Находим все слайды
@@ -81,21 +81,7 @@ var FullPageSlider = null;
 
                 while (ln--) {
                     var slide = this.goodSlides[ln];
-                    this.prefixedEvent(slide, "AnimationEnd", function (e) {
-                        if (e.animationName === config.effectName) {
-                            var next = this.goodSlides[this.index + 1];
-                            this.removeClass(this.goodSlides[this.index], this.active);
-                            if (!next) {
-                                this.index = 0;
-                            } else {
-                                this.index++;
-                            }
-                            timeout(function () {
-                                that.addClass(that.goodSlides[that.index], that.active);
-                                that.emit("tic");
-                            }, 0);
-                        }
-                    }.bind(this));
+                    this.prefixedEvent(slide, "AnimationEnd", this.cssAnimation);
                 }
             } else {
                 if ($) {//Если есть jquery
@@ -103,6 +89,21 @@ var FullPageSlider = null;
                 } else {
                     this.throwError("warn", "Ваш браузер не поддерживает css3 анимацию и вы забыли подключить jQuery!!!");
                 }
+            }
+        };
+        this.cssAnimation = function (e) {
+            if (e.animationName === config.effectName) {
+                var next = that.goodSlides[that.index + 1];
+                that.removeClass(that.goodSlides[that.index], that.active);
+                if (!next) {
+                    that.index = 0;
+                } else {
+                    that.index++;
+                }
+                timeout(function () {
+                    that.addClass(that.goodSlides[that.index], that.active);
+                    that.emit("tic");
+                }, 0);
             }
         };
         this.ieAnimation = function () {
@@ -224,14 +225,36 @@ var FullPageSlider = null;
                     break;
             }
         },
-        prefixedEvent: function (elem, type, callback) {
+        prefixedEvent: function (elem, type, callback, remove) {
             var pfx = ["webkit", ""];
             for (var p = 0; p < pfx.length; p++) {
                 if (!pfx[p]) {
                     type = type.toLowerCase();
                 }
-                elem.addEventListener(pfx[p] + type, callback, false);
+                if (remove) {
+                    elem.removeEventListener(pfx[p] + type, callback, false);
+                } else {
+                    elem.addEventListener(pfx[p] + type, callback, false);
+                }
             }
+        },
+        destroy: function () {
+            var ln = this.goodSlides.length;
+            //Удаляем прослушку окончания анимации
+            if (ln) {
+                while (ln--) {
+                    var slide = this.goodSlides[ln];
+                    this.prefixedEvent(slide, "AnimationEnd", this.cssAnimation, true);
+                }
+            }
+            //Удалем навигацию
+            if (this.next) {
+                this.next.removeEventListener("click", this.nextSlide, false);
+            }
+            if (this.prev) {
+                this.prev.removeEventListener("click", this.prevSlide, false);
+            }
+            that = null;
         },
         on: function (name, handler) {
             this.handlers[name] = handler;
