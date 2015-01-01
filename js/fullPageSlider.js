@@ -78,10 +78,9 @@ var FullPageSlider = null;
             if (this.css3) {
                 this.addClass(this.goodSlides[this.index], this.active);
                 var ln = this.goodSlides.length;
-
                 while (ln--) {
                     var slide = this.goodSlides[ln];
-                    this.prefixedEvent(slide, "AnimationEnd", this.cssAnimation);
+                    this.prefixedEvent(slide, "AnimationEnd", this.cssAnimationEnd);
                 }
             } else {
                 if ($) {//Если есть jquery
@@ -91,7 +90,7 @@ var FullPageSlider = null;
                 }
             }
         };
-        this.cssAnimation = function (e) {
+        this.cssAnimationEnd = function (e) {
             if (e.animationName === config.effectName) {
                 var next = that.goodSlides[that.index + 1];
                 that.removeClass(that.goodSlides[that.index], that.active);
