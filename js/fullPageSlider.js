@@ -1,9 +1,9 @@
 /**
  * Created by abaddon on 21.12.2014.
  */
-/*global window, document, console, setTimeout, navigator*/
+/*global window, document, console, setTimeout, navigator, Object*/
 var FullPageSlider = null;
-(function (w, d, n, timeout) {
+(function (w, d, n, timeout, o) {
     "use strict";
     var config = {}, that = null, $ = w.jQuery || false;
     FullPageSlider = function (options) {
@@ -13,7 +13,7 @@ var FullPageSlider = null;
             next: '.next',
             prev: '.prev',
             itemClass: '.item',
-            effectName: "one",
+            effectName: "horizont",
             animationDelay: 13000,
             scaleCof: 13
         }, options);
@@ -23,9 +23,25 @@ var FullPageSlider = null;
             goodSlides: [],
             index: 0,
             handlers: {},
-            active: "active",
+            active: config.effectName,
+            activeNext: config.effectName + "-next",
             css3: true
         });
+
+        o.defineProperty(this, "index", {
+            set: function (value) {
+                this.number = value;
+                this.next = this.goodSlides[value + 1];
+                if (!this.next) {
+                    this.next = this.goodSlides[0];
+                }
+                this.addClass(this.next, this.activeNext);
+            },
+            get: function () {
+                return this.number;
+            }
+        });
+
         if (/MSIE 9/i.test(n.userAgent)) {
             this.active = "badie";
             this.css3 = false;
@@ -101,6 +117,7 @@ var FullPageSlider = null;
                 }
                 timeout(function () {
                     that.addClass(that.goodSlides[that.index], that.active);
+                    that.removeClass(that.goodSlides[that.index], that.activeNext);
                     that.emit("tic");
                 }, 0);
             }
@@ -120,6 +137,7 @@ var FullPageSlider = null;
                         } else {
                             that.index++;
                         }
+                        that.removeClass(that.goodSlides[that.index], that.activeNext);
                         that.emit("tic");
                         that.ieAnimation();
                     });
@@ -156,6 +174,7 @@ var FullPageSlider = null;
                     prevPhase ? $(that.goodSlides[prevPhase]).stop(true, false) : "";
                     that.ieAnimation();
                 }
+                that.removeClass(that.goodSlides[that.index], that.activeNext);
             }, 0);
         };
         that = this;
@@ -264,4 +283,4 @@ var FullPageSlider = null;
             }
         }
     };
-}(window, document, navigator, setTimeout));
+}(window, document, navigator, setTimeout, Object));
