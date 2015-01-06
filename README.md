@@ -9,8 +9,6 @@ FullPageSlider
 - **Opera**
 - **Safary >= 5.1**
 
-Для использования в **IE 9** необходимо будет подключить **jQuery**.
-
 ###Установка:
     <link href="dist/css/slider.min.css" rel="stylesheet" type="text/css" />
     <script src="dist/js/fullPageSlider.min.js"></script>
@@ -20,11 +18,7 @@ FullPageSlider
 - **next** - селектор кнопки "Вперед"
 - **prev** - селектор кнопки "Назад"
 - **itemClass** - селектор слайда
-- **effectName** - название эффекта используемого для показа слайдов (Только для css3)
-
-###Дополнительные параметры для IE 9
-- **animationDelay** - длительность анимации
-- **scaleCof** - коэффициент увеличения слайда
+- **effectName** - название эффекта используемого для показа слайдов
 
 ###Запуск
 ####html:

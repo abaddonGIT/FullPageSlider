@@ -5,7 +5,7 @@
 var FullPageSlider = null;
 (function (w, d, n, timeout, o) {
     "use strict";
-    var config = {}, that = null, $ = w.jQuery || false;
+    var config = {}, that = null;
     FullPageSlider = function (options) {
         config = this.ext({
             sliderSelector: null,
@@ -14,8 +14,7 @@ var FullPageSlider = null;
             prev: '.prev',
             itemClass: '.item',
             effectName: "horizont",
-            animationDelay: 13000,
-            scaleCof: 13
+            delay: 3000
         }, options);
 
         this.ext(this, {
@@ -24,8 +23,11 @@ var FullPageSlider = null;
             index: 0,
             handlers: {},
             active: config.effectName,
+            activeFirst: config.effectName + "-first",
             activeNext: config.effectName + "-next",
-            css3: true
+            css3: true,
+            itemCount: 0,
+            lock: false
         });
 
         o.defineProperty(this, "index", {
@@ -35,7 +37,6 @@ var FullPageSlider = null;
                 if (!this.next) {
                     this.next = this.goodSlides[0];
                 }
-                this.addClass(this.next, this.activeNext);
             },
             get: function () {
                 return this.number;
@@ -75,14 +76,12 @@ var FullPageSlider = null;
         };
         //Находим все слайды
         this.getAllSlides = function () {
-            var slides = this.slides = this.slider.querySelectorAll(config.itemClass), ln = slides.length;
-            if (ln) {
+            this.slides = this.slider.querySelectorAll(config.itemClass);
+            if (this.slides.length) {
                 this.imgLoad(0, function () {
                     delete this.slides;
                     this.index = config.startSlide;
-                    //Стартуем
                     this.emit("load");
-                    //Вешаем прослушку на окончание анимации
                     this.addAnimationEndEvent();
                 }.bind(this));
             } else {
@@ -91,59 +90,37 @@ var FullPageSlider = null;
             }
         };
         this.addAnimationEndEvent = function () {
-            if (this.css3) {
-                this.addClass(this.goodSlides[this.index], this.active);
-                var ln = this.goodSlides.length;
-                while (ln--) {
-                    var slide = this.goodSlides[ln];
-                    this.prefixedEvent(slide, "AnimationEnd", this.cssAnimationEnd);
-                }
-            } else {
-                if ($) {//Если есть jquery
-                    this.ieAnimation();
-                } else {
-                    this.throwError("warn", "Ваш браузер не поддерживает css3 анимацию и вы забыли подключить jQuery!!!");
-                }
+            this.firstSlide();
+            var ln = this.itemCount;
+            while (ln--) {
+                var slide = this.goodSlides[ln];
+                this.prefixedEvent(slide, "AnimationEnd", this.cssAnimationEnd);
+                this.prefixedEvent(slide, "AnimationStart", this.cssAnimationStart);
+            }
+        };
+        this.firstSlide = function () {
+            this.addClass(this.goodSlides[this.index], this.activeFirst);
+            timeout(function () {
+                this.removeClass(this.goodSlides[this.index], this.activeFirst).addClass(this.goodSlides[this.index], this.active).addClass(this.next, this.activeNext);
+            }.bind(this), config.delay);
+        };
+        this.cssAnimationStart = function (e) {
+            if (e.animationName === config.effectName) {
+                clearTimeout(that.iterationTime);
+                that.lock = true;
             }
         };
         this.cssAnimationEnd = function (e) {
+            that.lock = false;
             if (e.animationName === config.effectName) {
-                var next = that.goodSlides[that.index + 1];
-                that.removeClass(that.goodSlides[that.index], that.active);
-                if (!next) {
-                    that.index = 0;
-                } else {
-                    that.index++;
-                }
-                timeout(function () {
-                    that.addClass(that.goodSlides[that.index], that.active);
-                    that.removeClass(that.goodSlides[that.index], that.activeNext);
+                that.iterationTime = timeout(function () {
+                    var current = that.goodSlides[that.index];
+                    that.removeClass(current, that.active);
+                    that.index < that.itemCount - 1 ? that.index++ : that.index = 0;
+                    that.addClass(that.next, that.activeNext).addClass(that.goodSlides[that.index], that.active).removeClass(that.goodSlides[that.index], that.activeNext);
                     that.emit("tic");
-                }, 0);
+                }, config.delay);
             }
-        };
-        this.ieAnimation = function () {
-            this.addClass(this.goodSlides[this.index], this.active);
-            $(this.goodSlides[this.index]).animate({"opacity": 1}, {
-                step: function (now) {
-                    $(this).css('-ms-transform', 'scale(' + (1 + (now / config.scaleCof) ) + ')');
-                },
-                done: function () {
-                    that.removeClass(that.goodSlides[that.index], that.active);
-                    $(this).animate({"opacity": 0}, config.animationDelay / 2, function () {
-                        var next = that.goodSlides[that.index + 1];
-                        if (!next) {
-                            that.index = 0;
-                        } else {
-                            that.index++;
-                        }
-                        that.removeClass(that.goodSlides[that.index], that.activeNext);
-                        that.emit("tic");
-                        that.ieAnimation();
-                    });
-                },
-                duration: config.animationDelay / 2
-            });
         };
         this.nextSlide = function (e) {
             that.paginationAction("next");
@@ -154,28 +131,19 @@ var FullPageSlider = null;
             e.preventDefault();
         };
         this.paginationAction = function (type) {
+            if (that.lock) return false;
             that.removeClass(that.goodSlides[that.index], that.active);
-            var phase, prevPhase = that.index;
+            clearTimeout(that.iterationTime);
             switch (type) {
                 case "next":
-                    phase = that.goodSlides[that.index + 1];
-                    phase ? that.index++ : that.index = 0;
+                    that.index < that.itemCount - 1 ? that.index++ : that.index = 0;
+                    that.removeClass(that.goodSlides[that.index], that.activeNext).addClass(that.goodSlides[that.index], that.active).addClass(that.next, that.activeNext);
                     break;
                 case "prev":
-                    phase = that.goodSlides[that.index - 1];
-                    phase ? that.index-- : that.index = that.goodSlides.length - 1;
+                    that.removeClass(that.next, that.activeNext).addClass(that.next, that.active).addClass(that.goodSlides[that.index], that.activeNext);
+                    that.index > 0 ? that.index-- : that.index = that.itemCount - 1;
                     break;
             }
-            timeout(function () {
-                if (that.css3) {
-                    that.emit(type, that.index);
-                    that.addClass(that.goodSlides[that.index], that.active);
-                } else {
-                    prevPhase ? $(that.goodSlides[prevPhase]).stop(true, false) : "";
-                    that.ieAnimation();
-                }
-                that.removeClass(that.goodSlides[that.index], that.activeNext);
-            }, 0);
         };
         that = this;
     };
@@ -190,6 +158,7 @@ var FullPageSlider = null;
                     img.onload = function () {
                         this.slides[i].style.cssText += "background-image: url(" + href + ");";//Добавляем фон
                         this.goodSlides.push(this.slides[i]);
+                        this.itemCount++;
                         i++;
                         that.imgLoad(i, back);
                         img = null;
@@ -221,6 +190,10 @@ var FullPageSlider = null;
                 var re = new RegExp("(^|\\s)" + className + "(\\s|$)", "g");
                 element.className = element.className.replace(re, "$1").replace(/\s+/g, " ").replace(/(^ | $)/g, "")
             }
+            return {
+                removeClass: that.removeClass,
+                addClass: that.addClass
+            };
         },
         addClass: function (element, className) {
             if (element.classList) {
@@ -228,6 +201,10 @@ var FullPageSlider = null;
             } else {
                 element.className += " " + className;
             }
+            return {
+                removeClass: that.removeClass,
+                addClass: that.addClass
+            };
         },
         throwError: function (type, text) {
             switch (type) {
@@ -254,24 +231,6 @@ var FullPageSlider = null;
                     elem.addEventListener(pfx[p] + type, callback, false);
                 }
             }
-        },
-        destroy: function () {
-            var ln = this.goodSlides.length;
-            //Удаляем прослушку окончания анимации
-            if (ln) {
-                while (ln--) {
-                    var slide = this.goodSlides[ln];
-                    this.prefixedEvent(slide, "AnimationEnd", this.cssAnimation, true);
-                }
-            }
-            //Удалем навигацию
-            if (this.next) {
-                this.next.removeEventListener("click", this.nextSlide, false);
-            }
-            if (this.prev) {
-                this.prev.removeEventListener("click", this.prevSlide, false);
-            }
-            that = null;
         },
         on: function (name, handler) {
             this.handlers[name] = handler;
