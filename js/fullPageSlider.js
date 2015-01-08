@@ -13,7 +13,7 @@ var FullPageSlider = null;
             next: '.next',
             prev: '.prev',
             itemClass: '.item',
-            effectName: "horizont",
+            effectName: "vertical",
             delay: 3000
         }, options);
 
@@ -23,8 +23,10 @@ var FullPageSlider = null;
             index: 0,
             handlers: {},
             active: config.effectName,
+            activeP: config.effectName + "-p",
             activeFirst: config.effectName + "-first",
             activeNext: config.effectName + "-next",
+            activePrev: config.effectName + "-prev",
             css3: true,
             itemCount: 0,
             lock: false
@@ -34,8 +36,10 @@ var FullPageSlider = null;
             set: function (value) {
                 this.number = value;
                 this.next = this.goodSlides[value + 1];
+                this.nextIndex = value + 1;
                 if (!this.next) {
                     this.next = this.goodSlides[0];
+                    this.nextIndex = 0;
                 }
             },
             get: function () {
@@ -100,24 +104,31 @@ var FullPageSlider = null;
         };
         this.firstSlide = function () {
             this.addClass(this.goodSlides[this.index], this.activeFirst);
+            this.lock = true;
             timeout(function () {
                 this.removeClass(this.goodSlides[this.index], this.activeFirst).addClass(this.goodSlides[this.index], this.active).addClass(this.next, this.activeNext);
+                this.lock = false;
             }.bind(this), config.delay);
         };
         this.cssAnimationStart = function (e) {
-            if (e.animationName === config.effectName) {
+            if (e.animationName === config.effectName || e.animationName === that.activeP) {
                 clearTimeout(that.iterationTime);
                 that.lock = true;
             }
         };
         this.cssAnimationEnd = function (e) {
             that.lock = false;
-            if (e.animationName === config.effectName) {
+            if (e.animationName === that.active || e.animationName === that.activeP) {
                 that.iterationTime = timeout(function () {
                     var current = that.goodSlides[that.index];
+                    that.clearAttribute();
                     that.removeClass(current, that.active);
                     that.index < that.itemCount - 1 ? that.index++ : that.index = 0;
-                    that.addClass(that.next, that.activeNext).addClass(that.goodSlides[that.index], that.active).removeClass(that.goodSlides[that.index], that.activeNext);
+                    that.addClass(that.next, that.activeNext)
+                        .removeClass(that.next, that.active)
+                        .addClass(that.goodSlides[that.index], that.active)
+                        .removeClass(that.goodSlides[that.index], that.activeNext);
+
                     that.emit("tic");
                 }, config.delay);
             }
@@ -134,14 +145,23 @@ var FullPageSlider = null;
             if (that.lock) return false;
             that.removeClass(that.goodSlides[that.index], that.active);
             clearTimeout(that.iterationTime);
+            that.clearAttribute();
             switch (type) {
                 case "next":
                     that.index < that.itemCount - 1 ? that.index++ : that.index = 0;
-                    that.removeClass(that.goodSlides[that.index], that.activeNext).addClass(that.goodSlides[that.index], that.active).addClass(that.next, that.activeNext);
+                    that.removeClass(that.goodSlides[that.index], that.activeNext)
+                        .addClass(that.goodSlides[that.index], that.active)
+                        .removeClass(that.next, that.active)
+                        .addClass(that.next, that.activeNext);
                     break;
                 case "prev":
-                    that.removeClass(that.next, that.activeNext).addClass(that.next, that.active).addClass(that.goodSlides[that.index], that.activeNext);
+                    that.setAttribute();
+                    that.removeClass(that.goodSlides[that.nextIndex + 1 < that.itemCount ? that.nextIndex + 1 : 0], that.active)
+                        .removeClass(that.next, that.activeNext)
+                        .addClass(that.next, that.active)
+                        .addClass(that.goodSlides[that.index], that.activeNext);
                     that.index > 0 ? that.index-- : that.index = that.itemCount - 1;
+                    that.removeClass(that.next, that.active);
                     break;
             }
         };
@@ -149,6 +169,15 @@ var FullPageSlider = null;
     };
 
     FullPageSlider.prototype = {
+        clearAttribute: function () {
+            that.goodSlides[that.index].removeAttribute("name");
+            that.goodSlides[that.nextIndex + 1 < that.itemCount ? that.nextIndex + 1 : 0].removeAttribute("name");
+            that.next.removeAttribute("name");
+        },
+        setAttribute: function () {
+            that.next.setAttribute("name", "prev");
+            that.goodSlides[that.index].setAttribute("name", "prev");
+        },
         imgLoad: function (i, back) {
             if (this.slides[i]) {
                 var href = this.slides[i].getAttribute("data-image"), img;
@@ -184,11 +213,13 @@ var FullPageSlider = null;
             return one;
         },
         removeClass: function (element, className) {
-            if (element.classList) {
-                element.classList.remove(className);
-            } else {
-                var re = new RegExp("(^|\\s)" + className + "(\\s|$)", "g");
-                element.className = element.className.replace(re, "$1").replace(/\s+/g, " ").replace(/(^ | $)/g, "")
+            if (element) {
+                if (element.classList) {
+                    element.classList.remove(className);
+                } else {
+                    var re = new RegExp("(^|\\s)" + className + "(\\s|$)", "g");
+                    element.className = element.className.replace(re, "$1").replace(/\s+/g, " ").replace(/(^ | $)/g, "")
+                }
             }
             return {
                 removeClass: that.removeClass,
@@ -196,10 +227,12 @@ var FullPageSlider = null;
             };
         },
         addClass: function (element, className) {
-            if (element.classList) {
-                element.classList.add(className);
-            } else {
-                element.className += " " + className;
+            if (element) {
+                if (element.classList) {
+                    element.classList.add(className);
+                } else {
+                    element.className += " " + className;
+                }
             }
             return {
                 removeClass: that.removeClass,

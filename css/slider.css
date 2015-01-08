@@ -31,14 +31,84 @@
   background-position: 50% 50%;
 }
 .full-slider .item.horizont-first,
-.full-slider .item.one-first {
+.full-slider .item.vertical-first {
   opacity: 1;
+}
+.full-slider .item.vertical {
+  -webkit-animation-name: vertical;
+          animation-name: vertical;
+  -webkit-animation-duration: 3s;
+          animation-duration: 3s;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-delay: 0;
+          animation-delay: 0;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+}
+.full-slider .item.vertical[name=prev] {
+  -webkit-animation-name: vertical-p;
+          animation-name: vertical-p;
+  -webkit-animation-duration: 3s;
+          animation-duration: 3s;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-delay: 0;
+          animation-delay: 0;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+}
+.full-slider .item.vertical-next {
+  -webkit-animation-name: vertical-next;
+          animation-name: vertical-next;
+  -webkit-animation-duration: 3s;
+          animation-duration: 3s;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-delay: 0;
+          animation-delay: 0;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+}
+.full-slider .item.vertical-next[name=prev] {
+  -webkit-animation-name: vertical-prev;
+          animation-name: vertical-prev;
+  -webkit-animation-duration: 3s;
+          animation-duration: 3s;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-delay: 0;
+          animation-delay: 0;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
 }
 .full-slider .item.horizont {
   -webkit-animation-name: horizont;
           animation-name: horizont;
-  -webkit-animation-duration: 5s;
-          animation-duration: 5s;
+  -webkit-animation-duration: 3s;
+          animation-duration: 3s;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-delay: 0;
+          animation-delay: 0;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+}
+.full-slider .item.horizont[name=prev] {
+  -webkit-animation-name: horizont-p;
+          animation-name: horizont-p;
+  -webkit-animation-duration: 3s;
+          animation-duration: 3s;
   -webkit-animation-timing-function: linear;
           animation-timing-function: linear;
   -webkit-animation-delay: 0;
@@ -51,8 +121,22 @@
 .full-slider .item.horizont-next {
   -webkit-animation-name: horizont-next;
           animation-name: horizont-next;
-  -webkit-animation-duration: 5s;
-          animation-duration: 5s;
+  -webkit-animation-duration: 3s;
+          animation-duration: 3s;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-delay: 0;
+          animation-delay: 0;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+  -webkit-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+}
+.full-slider .item.horizont-next[name=prev] {
+  -webkit-animation-name: horizont-prev;
+          animation-name: horizont-prev;
+  -webkit-animation-duration: 3s;
+          animation-duration: 3s;
   -webkit-animation-timing-function: linear;
           animation-timing-function: linear;
   -webkit-animation-delay: 0;
@@ -65,8 +149,8 @@
 .full-slider .item.one {
   -webkit-animation-name: one;
           animation-name: one;
-  -webkit-animation-duration: 5s;
-          animation-duration: 5s;
+  -webkit-animation-duration: 8s;
+          animation-duration: 8s;
   -webkit-animation-timing-function: linear;
           animation-timing-function: linear;
   -webkit-animation-delay: 0;
@@ -78,6 +162,102 @@
 }
 .full-slider .item.badie {
   opacity: 0;
+}
+@-webkit-keyframes vertical {
+  0% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(100%);
+            transform: translateY(100%);
+  }
+}
+@keyframes vertical {
+  0% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(100%);
+            transform: translateY(100%);
+  }
+}
+@-webkit-keyframes vertical-next {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-100%);
+            transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+}
+@keyframes vertical-next {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-100%);
+            transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+}
+@-webkit-keyframes vertical-p {
+  0% {
+    opacity: 1;
+    -webkit-transform: translateY(0%);
+            transform: translateY(0%);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(-100%);
+            transform: translateY(-100%);
+  }
+}
+@keyframes vertical-p {
+  0% {
+    opacity: 1;
+    -webkit-transform: translateY(0%);
+            transform: translateY(0%);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(-100%);
+            transform: translateY(-100%);
+  }
+}
+@-webkit-keyframes vertical-prev {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(100%);
+            transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0%);
+            transform: translateY(0%);
+  }
+}
+@keyframes vertical-prev {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(100%);
+            transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0%);
+            transform: translateY(0%);
+  }
 }
 @-webkit-keyframes horizont-next {
   0% {
@@ -117,6 +297,46 @@
   100% {
     opacity: 0;
     left: -100%;
+  }
+}
+@-webkit-keyframes horizont-prev {
+  0% {
+    opacity: 0;
+    left: -100%;
+  }
+  100% {
+    opacity: 1;
+    left: 0;
+  }
+}
+@keyframes horizont-prev {
+  0% {
+    opacity: 0;
+    left: -100%;
+  }
+  100% {
+    opacity: 1;
+    left: 0;
+  }
+}
+@-webkit-keyframes horizont-p {
+  0% {
+    opacity: 1;
+    left: 0;
+  }
+  100% {
+    opacity: 0;
+    left: 100%;
+  }
+}
+@keyframes horizont-p {
+  0% {
+    opacity: 1;
+    left: 0;
+  }
+  100% {
+    opacity: 0;
+    left: 100%;
   }
 }
 @-webkit-keyframes one {
